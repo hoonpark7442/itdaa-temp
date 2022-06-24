@@ -22,13 +22,14 @@ module Notifications
 
         job_id = Notifications::MessageSender.perform_aync(payload)
 
-        # 말씀해주신 pub/sub 시스템 혹은 제가 아는 선에서는 sidekiq-status gem을 통해 
+        # 말씀해주신 pub/sub 시스템을 통해 메시지 전송 여부 체크가 되어야 할 것 같습니다. 혹은 제가 아는 선에서는 sidekiq-status gem을 통해 status를
+        # 체크해 볼 수 있을 것 같습니다.
         data = Sidekiq::Status::get_all(job_id)
         status = Sidekiq::Status::message(job_id)
 
         # 성능 고려해서 리팩토링 필요할 것으로 보입니다.
-        # 실패 했을 경우 처리가 좀 부족해 보입니다. 좀 더 고민해보겠습니다.
         # 실패 했을 경우에 각각의 Notification status에 false 데이터를 입력해야 될 거 같습니다.
+        # 실패 했을 경우 처리가 좀 부족해 보입니다. 좀 더 고민해보겠습니다.
         if status == "success" 
           user_ids.each do |user|
             Notification.create(
